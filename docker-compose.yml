@@ -1,0 +1,33 @@
+version: '3.4'
+services:
+
+  db:
+    container_name: doorkeeper-db
+    image: postgres:14.2-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=doorkeeper
+      - POSTGRES_USER=doorkeeper
+      - POSTGRES_PASSWORD=doorkeeper
+    ports:
+      - '5432:5432'
+
+  web:
+    container_name: doorkeeper-web
+    image: doorkeeper-dev:latest
+    build:
+      context: .
+      args:
+        DJANGO_ENV: development
+#        Test: ${TEST_ENV}
+    environment:
+      PYTHONIOENCODING: utf8
+      PYTHONPATH: .
+    restart: always
+    command: python -Wd manage.py runserver 127.0.0.1:8000
+    ports:
+      - '8000:8000'
+    stdin_open: true
+    tty: true
+    depends_on:
+      - db
